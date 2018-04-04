@@ -1,4 +1,4 @@
-from genetics import *
+from environmentSimulator import *
 
 grid.writeOut(DATA_DIR, "turn0.txt")
 

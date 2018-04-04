@@ -3,7 +3,7 @@
 import pygame
 import os 
 import sys
-from genetics import *
+from environmentSimulator import *
 
 GRID_SIZE = 20
 SCREEN_WIDTH = 640
