@@ -1,41 +1,38 @@
 import random 
 import os
+import json 
 import gameobjects
 import Grid
+from DataProcessors import CsvReader 
+import Environment
 
 GRID_SIZE = 1000
-NUM_NINJAS = 500
-NUM_TREES = 10000
+NUM_NINJAS = 5000
+NUM_TREES = 20000
 NUM_VILLAGERS = 800
-NUM_TURNS = 10
+NUM_TURNS = 100
 DATA_DIR = "grids"
 
+#print("making elevationGrid")
+#elevationGrid = CsvReader.CsvReader("elev/data/fuji_1000.csv", [int,int,int], maxSize=1000).getGrid()
+#print("writing elevationGrid to json")
+#with open("elev/data/fuji_1000.json", 'w') as f:
+    #f.write(json.dumps(elevationGrid))
+#print("exiting")
+#exit()
 
-def writeOut(filename, gridInstance):
-    text = ""
-    for line in gridInstance.grid:
-        for square in line:
-            text += square
-        text += "\n" 
+print("loading elevationGrid")
+with open("elev/data/fuji_1000.json") as f:
+    elevationGrid = json.loads(f.read())
+print("elevationGrid size = " + str(len(elevationGrid)) + "x" + str(len(elevationGrid[0])))
 
-    with open(os.path.join(DATA_DIR, filename), 'w') as f:
-        f.write(text)
-
-grid = Grid.Grid(GRID_SIZE)
-gameObjects = []
-objectClasses = {}
-
-def addGameObject(gameobject, masterList, classListContainer):
-    # add to master list:
-    masterList.append(gameobject)
-    # add to class list: 
-    try:
-        classListContainer[gameobject.__class__.__name__].append(gameobject)
-    except KeyError:
-        classListContainer[gameobject.__class__.__name__] = [gameobject]
+print("making game grid")
+grid = Grid.Grid(GRID_SIZE, GRID_SIZE, elevationGrid)
+grid.environment = Environment.Environment()
+print("made game grid")
 
 # Initialize grid:
-def placeObjects(number, gameobjectClass):
+def placeObjects(number, gameobjectClass, grid):
     for i in range(number):
         square = " "
         x_pos = 0
@@ -43,27 +40,16 @@ def placeObjects(number, gameobjectClass):
         while square == " ":
             x_pos = random.randint(0, GRID_SIZE-1)
             y_pos = random.randint(0, GRID_SIZE-1)
-            square = grid.get(x_pos, y_pos)
+            square = grid.getSymbol(x_pos, y_pos)
             if(square == " "):
-                gameobject = gameobjectClass()
+                gameobject = gameobjectClass(grid)
                 square = gameobject.symbol
                 gameobject.x = x_pos
                 gameobject.y = y_pos
-                addGameObject(gameobject, gameObjects, objectClasses)
-                grid.set(x_pos, y_pos, square)
+                #addGameObject(gameobject, gameObjects, objectClasses)
+                grid.placeGameobject(gameobject)
                 
             #print ("tree num = " + str(i) + " square =  " + square + " x_pos = " + str(x_pos)  + " y_pos = " + str(y_pos))
 
-placeObjects(NUM_TREES, gameobjects.Tree)
-placeObjects(NUM_NINJAS, gameobjects.Ninja)
-
-for ninja in objectClasses["Ninja"]:
-    #print ("x = " + str(ninja.x))
-    #print ("y = " + str(ninja.y))
-    if grid.getNorth(ninja.x, ninja.y)  == "t":
-        grid.set(ninja.x, ninja.y, "N")
-
-writeOut("turn0.txt", grid)
-
-#for turn in range(NUM_TURNS):
-
+placeObjects(NUM_TREES, gameobjects.Tree, grid)
+placeObjects(NUM_NINJAS, gameobjects.Ninja, grid)
