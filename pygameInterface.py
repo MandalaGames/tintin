@@ -37,6 +37,27 @@ def draw(gameobject, offsetX, offsetY):
 
 offsetX = 0
 offsetY = 0
+
+def getInput(offsetX, offsetY):
+    keys = pygame.key.get_pressed()  #checking pressed keys
+    if keys[pygame.K_UP]:
+        offsetY -= 10
+    if keys[pygame.K_DOWN]:
+        offsetY += 10
+    if keys[pygame.K_LEFT]:
+        offsetX -= 10
+    if keys[pygame.K_RIGHT]:
+        offsetX += 10
+    return offsetX, offsetY
+
+def doRect():
+    position = x,y = 0,0
+    size = w,h = 32,32
+    colour = 0,255,0
+    rect = Rect(position, size)
+    image = Surface(size)
+    image.fill(colour)
+
 while True:
     clock.tick(50)
 
@@ -47,21 +68,17 @@ while True:
     # Clear the screen
     screen.fill((50, 200, 50))
 
+
+    s = pygame.display.get_surface()
+    #rect = pygame.Rect(topleft = (0,0), size=(GRID_SIZE,GRID_SIZE))
+    #s.fill(Color("red"), rect)
+
     # Check input
+    offsetX, offsetY = getInput(offsetX, offsetY)
     # Move objects ...
     # Draw objects ...
 
     # Update the screen
-
-    keys = pygame.key.get_pressed()  #checking pressed keys
-    if keys[pygame.K_UP]:
-        offsetY -= 10
-    if keys[pygame.K_DOWN]:
-        offsetY += 10
-    if keys[pygame.K_LEFT]:
-        offsetX -= 10
-    if keys[pygame.K_RIGHT]:
-        offsetX += 10
 
     for gameobject in grid.gameObjects:
         gameobject.doTurn()

@@ -7,7 +7,7 @@ from DataProcessors import CsvReader
 import Environment
 
 GRID_SIZE = 1000
-NUM_NINJAS = 5000
+NUM_NINJAS = 1000
 NUM_TREES = 20000
 NUM_VILLAGERS = 800
 NUM_TURNS = 100
