@@ -35,8 +35,17 @@ class Grid(object):
         except KeyError:
             return 0
 
-    def placeGameobject(self, gameobject):
-        oldGameobject = self.grid[gameobject.y][gameobject.x].gameobject 
+    def getClass(self, classname):
+        try:
+            return self.objectClasses[classname]
+        except KeyError:
+            return []
+
+    def addGameobject(self, gameobject):
+        try:
+            oldGameobject = self.grid[gameobject.y][gameobject.x].gameobject 
+        except IndexError: # FIXME: off-grid?
+            return
 
         if oldGameobject != None:
             self.gameObjects.remove(oldGameobject)

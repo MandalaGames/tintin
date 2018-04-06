@@ -28,9 +28,17 @@ class GameObject(object):
     def moveForward(self, amount):
         self.move(self.direction.x * amount, self.direction.y * amount)
 
-    # Return symbol of object dx, dy away from us
+    # Return symbol of object dx, dy away from us FIXME not used?
     def check(self, dx, dy):
         return self.grid.grid[self.y + dy][self.x + dx].gameobject.symbol
+
+    def getInFront(self):
+        try:
+            return self.grid.grid[self.y + self.direction.y][self.x + self.direction.x].gameobject
+        except IndexError: # NOTE at the edge of screen
+            return None
+        except AttributeError: # NOTE at the edge of screen
+            return None
 
     # Change symbol of object dx, dy away from us
     def change(self, dx, dy, symbol):
@@ -39,7 +47,7 @@ class GameObject(object):
     # Check symbol of object in front of us
     def checkInFront(self):
         try:
-            return self.grid.grid[self.y + self.direction.y][self.x + self.direction.x].gameobject.symbol
+            return self.getInFront().symbol
         except IndexError: # NOTE at the edge of screen
             return " "
         except AttributeError: # NOTE at the edge of screen
@@ -57,7 +65,7 @@ class GameObject(object):
             gameobject.x = self.x + self.direction.x
             gameobject.y = self.y + self.direction.y
             #self.grid.grid[self.y + self.direction.y][self.x + self.direction.x].gameobject = gameobject
-            self.grid.placeGameobject(gameobject)
+            self.grid.addGameobject(gameobject)
         except AttributeError: # NOTE at the edge of screen
             pass
          
@@ -87,10 +95,17 @@ class Ninja(Person):
         super(Ninja, self).__init__(grid)
         self.symbol = "n"
         self.wood = 0
+        self.tomatoes = 0
+        self.money = random.randint(0,10)
 	self.sprite = "ninja.png"
+    def rob(self, person):
+        amount = random.randint(0, self.money)
+        person.money -= amount
+        self.money += amount
+
     def doTurn(self):
         if self.checkInFront() == 't':
-            if self.wood < 4:
+            if self.wood < 6:
                 deadTree = DeadTree(self.grid)
                 self.placeInFront(deadTree)
                 self.wood += 1
@@ -101,26 +116,86 @@ class Ninja(Person):
 
         elif self.checkInFront() == 'x' or self.checkInFront() == 'F':
             self.moveForward(2)
+        elif self.checkInFront() == 'o' or self.checkInFront() == 'v':
+            oldman = self.getInFront()
+            self.rob(oldman)
+            self.moveForward(2)
         else:
             self.moveForward(1)
+
+class Villager(Person):
+    def __init__(self, grid):
+        super(Villager, self).__init__(grid)
+        self.symbol = "v"
+        self.wood = 0
+        self.tomatoes = 0
+        self.money = random.randint(0,10)
+	self.sprite = "villager.png"
+    def doTurn(self):
+        if self.checkInFront() == 't':
+            deadTree = DeadTree(self.grid)
+            self.placeInFront(deadTree)
+            self.wood += 1
+
+        elif self.checkInFront() == 'x' or self.checkInFront() == 'F':
+            self.moveForward(2)
+        else:
+            self.moveForward(1)
+
+class OldMan(Villager):
+    def __init__(self, grid):
+        super(OldMan, self).__init__(grid)
+        self.symbol = "o"
+        self.wood = 0
+        self.tomatoes = random.randint(2,5)
+        self.money = random.randint(5,10)
+	self.sprite = "old man.png"
+        self.turnCounter = 0
+        self.gardenerSkill = random.randint(50,100) # FIXME: high skill means plant less trees
+
+    def plantTree(self, x, y):
+        tree = Tree(self.grid)
+        tree.x = x
+        tree.y = y
+        self.grid.addGameobject(tree)
+        tree.symbol = "T" #FIXME remove
+        print("planted tree") # FIXME remove
+
+    def doTurn(self):
+        self.turnCounter  += 1
+        if self.turnCounter % 2 == 0:
+            if self.checkInFront() == 't' or self.checkInFront() == 'x' or self.checkInFront() == 'F':
+                self.moveForward(2)
+            else:
+                self.moveForward(1)
+        if self.turnCounter % self.gardenerSkill == 0:
+            x = self.x
+            y = self.y
+            self.moveForward(1)
+            self.plantTree(x, y)
+            self.turnCounter = 0
 
 class Factory(GameObject):
     def __init__(self, grid):
         super(Factory, self).__init__(grid)
         self.symbol = "F"
-        self.turnsSinceStart = 0
+        self.turnCounter  = 0
 	self.sprite = "factory.png"
+        self.money = 0
     def doTurn(self):
-        self.turnsSinceStart += 1
-        if self.turnsSinceStart % 5 == 0:
+        self.turnCounter  += 1
+        if self.turnCounter % 5 == 0:
             self.releaseSmog()
+            self.turnCounter = 0
+            self.money += 1
     def releaseSmog(self):
-        self.grid.environment.co2 += 1000
+        self.grid.environment.co2 += 50
 
 class House(GameObject):
     def __init__(self, grid):
         super(Factory, self).__init__(grid)
         self.symbol = "H"
+        self.sprite = ""
 
 class Tree(GameObject):
     def __init__(self, grid):

@@ -35,6 +35,10 @@ def draw(gameobject, offsetX, offsetY):
 
     screen.blit(myimage, imagerect)
 
+def getTotalMoney(people):
+    total = sum(person.money for person in people)
+    return total
+
 offsetX = 0
 offsetY = 0
 
@@ -50,13 +54,22 @@ def getInput(offsetX, offsetY):
         offsetX += 10
     return offsetX, offsetY
 
-def doRect():
+def getRect():
     position = x,y = 0,0
     size = w,h = 32,32
-    colour = 0,255,0
-    rect = Rect(position, size)
-    image = Surface(size)
+    colour = 0,0,0
+    rect = pygame.Rect(position, size)
+    image = pygame.Surface(size)
     image.fill(colour)
+    return rect, image
+
+def doRect():
+    rect, image = getRect()
+    screen.blit(image, rect)
+
+villagers = grid.getClass("Villager")
+ninjas = grid.getClass("Ninja")
+oldmen = grid.getClass("OldMan")
 
 while True:
     clock.tick(50)
@@ -68,7 +81,6 @@ while True:
     # Clear the screen
     screen.fill((50, 200, 50))
 
-
     s = pygame.display.get_surface()
     #rect = pygame.Rect(topleft = (0,0), size=(GRID_SIZE,GRID_SIZE))
     #s.fill(Color("red"), rect)
@@ -77,16 +89,25 @@ while True:
     offsetX, offsetY = getInput(offsetX, offsetY)
     # Move objects ...
     # Draw objects ...
-
-    # Update the screen
-
     for gameobject in grid.gameObjects:
         gameobject.doTurn()
         if inWindow(gameobject, offsetX, offsetY):
             draw(gameobject, offsetX, offsetY)
+
+    #doRect()
+
+    # Update the screen
+
     pygame.display.flip()
+
+
+
+    # Print debug messages:
     #print("writing out game grid " + str(turn))
     #grid.writeOut(DATA_DIR, "turn" + str(turn) + ".txt")
     print("num Trees = " + str(grid.getCount("Tree")))
     print("num Factories = " + str(grid.getCount("Factory")))
     print("co2 = " + str(grid.environment.co2))
+    print("villager money= " + str(getTotalMoney(villagers))) 
+    print("ninja money= " + str(getTotalMoney(ninjas))) 
+    print("old man money= " + str(getTotalMoney(oldmen))) 

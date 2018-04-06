@@ -7,8 +7,9 @@ from DataProcessors import CsvReader
 import Environment
 
 GRID_SIZE = 1000
-NUM_NINJAS = 1000
+NUM_NINJAS = 800
 NUM_TREES = 20000
+NUM_OLDMEN = 100
 NUM_VILLAGERS = 800
 NUM_TURNS = 100
 DATA_DIR = "grids"
@@ -47,9 +48,11 @@ def placeObjects(number, gameobjectClass, grid):
                 gameobject.x = x_pos
                 gameobject.y = y_pos
                 #addGameObject(gameobject, gameObjects, objectClasses)
-                grid.placeGameobject(gameobject)
+                grid.addGameobject(gameobject)
                 
             #print ("tree num = " + str(i) + " square =  " + square + " x_pos = " + str(x_pos)  + " y_pos = " + str(y_pos))
 
 placeObjects(NUM_TREES, gameobjects.Tree, grid)
+placeObjects(NUM_OLDMEN, gameobjects.OldMan, grid)
 placeObjects(NUM_NINJAS, gameobjects.Ninja, grid)
+placeObjects(NUM_VILLAGERS, gameobjects.Villager, grid)
