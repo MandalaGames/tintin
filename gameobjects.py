@@ -1,10 +1,6 @@
 import random
 import Grid
-
-class Direction(object):
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
+import Map
 
 class GameObject(object):
     def __init__(self,grid):
@@ -77,17 +73,7 @@ class Person(GameObject):
         super(Person, self).__init__(grid)
         self.symbol = "p"
 
-        self.cardinalDirection = ['n','s','e','w'][random.randint(0,3)]
-
-        if(self.cardinalDirection == 'n'):
-            self.direction = Direction(0, -1)
-        if(self.cardinalDirection == 's'):
-            self.direction = Direction(0, 1)
-        if(self.cardinalDirection == 'e'):
-            self.direction = Direction(1, 0)
-        if(self.cardinalDirection == 'w'):
-            self.direction = Direction(-1, 0)
-        
+        self.direction = Map.Direction.random() 
         #self.symbol = self.cardinalDirection
     
 class Ninja(Person):

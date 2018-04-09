@@ -30,7 +30,11 @@ print("elevationGrid size = " + str(len(elevationGrid)) + "x" + str(len(elevatio
 print("making game grid")
 grid = Grid.Grid(GRID_SIZE, GRID_SIZE, elevationGrid)
 grid.environment = Environment.Environment()
+
+grid.environment.generateLake(30, 5, 5, grid)
+
 print("made game grid")
+
 
 # Initialize grid:
 def placeObjects(number, gameobjectClass, grid):

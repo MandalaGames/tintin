@@ -4,23 +4,24 @@ import pygame
 import os 
 import sys
 from environmentSimulator import *
+import Screen
 
-GRID_SIZE = 20
-SCREEN_WIDTH = 640
-SCREEN_HEIGHT = 480
+SCREEN_PIXELS_PER_GRID_SQUARE = 20
+WIDTH_SQUARES = 32 
+HEIGHT_SQUARES = 24
+
 SPRITE_DIR = "sprites"
 
 pygame.init()
 
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+screen= Screen.Screen(WIDTH_SQUARES, HEIGHT_SQUARES, SCREEN_PIXELS_PER_GRID_SQUARE)
+
 pygame.display.set_caption("environment simulation :)")
 
 clock = pygame.time.Clock()
 
+# TODO: move to Image class
 imgDict = {}
-
-def inWindow(gameobject, offsetX, offsetY):
-    return gameobject.x * GRID_SIZE - offsetX < SCREEN_WIDTH and gameobject.y * GRID_SIZE - offsetY < SCREEN_HEIGHT
 
 def getImage(spritename):
     try:
@@ -28,16 +29,13 @@ def getImage(spritename):
     except KeyError:
         imgDict[spritename] = pygame.image.load(os.path.join(SPRITE_DIR, spritename))
         return imgDict[spritename]
+# end TODO: move to Image class
 
-def draw(gameobject, offsetX, offsetY):
-    myimage = getImage(gameobject.sprite) 
-    imagerect = myimage.get_rect(topleft = (gameobject.x * GRID_SIZE - offsetX, gameobject.y * GRID_SIZE - offsetY))
-
-    screen.blit(myimage, imagerect)
-
+# TODO: move
 def getTotalMoney(people):
     total = sum(person.money for person in people)
     return total
+# end TODO: move
 
 offsetX = 0
 offsetY = 0
@@ -52,24 +50,25 @@ def getInput(offsetX, offsetY):
         offsetX -= 10
     if keys[pygame.K_RIGHT]:
         offsetX += 10
-    return offsetX, offsetY
+    if keys[pygame.K_p]:
+        paused = True
+    else :
+        paused = False
+    return offsetX, offsetY, paused
 
-def getRect():
-    position = x,y = 0,0
-    size = w,h = 32,32
-    colour = 0,0,0
-    rect = pygame.Rect(position, size)
-    image = pygame.Surface(size)
-    image.fill(colour)
-    return rect, image
 
-def doRect():
-    rect, image = getRect()
-    screen.blit(image, rect)
+def paintElev():
+    pass
+
+
+def drawSquare(grid, screenXSquares, screenYSquares):
+    pass
 
 villagers = grid.getClass("Villager")
 ninjas = grid.getClass("Ninja")
 oldmen = grid.getClass("OldMan")
+
+paused = False
 
 while True:
     clock.tick(50)
@@ -78,29 +77,32 @@ while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             sys.exit()
-    # Clear the screen
-    screen.fill((50, 200, 50))
 
-    s = pygame.display.get_surface()
+
+
+    #s = pygame.display.get_surface()
     #rect = pygame.Rect(topleft = (0,0), size=(GRID_SIZE,GRID_SIZE))
     #s.fill(Color("red"), rect)
 
+    screen.drawGrid(grid, offsetX, offsetY)#, screen.width_squares, screen.height_squares)
+
     # Check input
-    offsetX, offsetY = getInput(offsetX, offsetY)
+    offsetX, offsetY, paused = getInput(offsetX, offsetY)
     # Move objects ...
     # Draw objects ...
-    for gameobject in grid.gameObjects:
-        gameobject.doTurn()
-        if inWindow(gameobject, offsetX, offsetY):
-            draw(gameobject, offsetX, offsetY)
+    if not paused:
+        for gameobject in grid.gameObjects:
+            gameobject.doTurn()
+            if screen.inWindow(gameobject, offsetX, offsetY):
+                image = getImage(gameobject.sprite) 
 
-    #doRect()
+                screen.draw(gameobject, image, offsetX, offsetY)
+
+    paintElev()
 
     # Update the screen
 
     pygame.display.flip()
-
-
 
     # Print debug messages:
     #print("writing out game grid " + str(turn))
