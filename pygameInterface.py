@@ -79,11 +79,6 @@ while True:
             sys.exit()
 
 
-
-    #s = pygame.display.get_surface()
-    #rect = pygame.Rect(topleft = (0,0), size=(GRID_SIZE,GRID_SIZE))
-    #s.fill(Color("red"), rect)
-
     screen.drawGrid(grid, offsetX, offsetY)#, screen.width_squares, screen.height_squares)
 
     # Check input

@@ -28,33 +28,36 @@ class Screen(object):
     def drawSquare(grid, x, y):
         pass
 
-    def getRect(self, x, y, w, h, color):
+    def getRect(self, x, y, w, h):
         position = x,y
         size = w,h
-        #colour = 0,0,0
         rect = pygame.Rect(position, size)
-        image = pygame.Surface(size)
-        image.fill(color)
-        return rect, image
+        return rect
 
     def drawRect(self, x, y, w, h, color):
-        rect, image = self.getRect(x, y, w, h, color)
-        self.pygameScreen.blit(image, rect)
-
+        rect = self.getRect(x, y, w, h)
+        pygame.draw.rect(self.pygameScreen, color,(x,y,w,w))
 
     # NOTE: screenSizeX and screenSizeY are in Squares, not pixels.
     def drawGrid(self, grid, offsetX, offsetY):
+
         # Clear the screen
-        self.pygameScreen.fill((50, 200, 50))
-        #self.doRect()
-        #offsetScreenX = offsetX * self.pixelsPerSquare
-        #offsetScreenY = offsetY * self.pixelsPerSquare
+        #self.pygameScreen.fill((50, 200, 50))
 
-        for y,row in enumerate(grid.grid[offsetY:offsetY + grid.ysize]): # TODO FIXME double check
-            for x,square in enumerate(row[offsetX:offsetX + grid.xsize]):
+        size = self.width_squares, self.height_squares
 
+        offsetXSq = int( offsetX / self.pixelsPerSquare)
+        offsetYSq = int( offsetY / self.pixelsPerSquare)
+
+        offsetXPix = offsetX - self.pixelsPerSquare * offsetXSq
+        offsetYPix = offsetY - self.pixelsPerSquare * offsetYSq
+
+        print(offsetXPix, offsetYPix)
+        x_range= offsetXSq, offsetXSq + self.width_squares
+        y_range = offsetYSq, offsetYSq + self.height_squares
+        for y in range(y_range[0], y_range[1]): # TODO FIXME double check
+            row = grid.grid[y]
+            for x in range(x_range[0], x_range[1]): # TODO FIXME double check
+                square = row[x]
                 color = (square.color.r, square.color.g, square.color.b)
-                self.drawRect((x - offsetX) * self.pixelsPerSquare, (y - offsetY) * self.pixelsPerSquare, self.pixelsPerSquare, self.pixelsPerSquare, color)
-
-    
-
+                self.drawRect((x - offsetXSq) * self.pixelsPerSquare - offsetXPix, (y - offsetYSq) * self.pixelsPerSquare - offsetYPix, self.pixelsPerSquare, self.pixelsPerSquare, color)
