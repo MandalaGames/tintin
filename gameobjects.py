@@ -92,8 +92,8 @@ class Ninja(Person):
     def doTurn(self):
         if self.checkInFront() == 't':
             if self.wood < 6:
-                deadTree = DeadTree(self.grid)
-                self.placeInFront(deadTree)
+                wood = Wood(self.grid)
+                self.placeInFront(wood)
                 self.wood += 1
             else:
                 factory = Factory(self.grid)
@@ -119,8 +119,8 @@ class Villager(Person):
 	self.sprite = "villager.png"
     def doTurn(self):
         if self.checkInFront() == 't':
-            deadTree = DeadTree(self.grid)
-            self.placeInFront(deadTree)
+            wood = Wood(self.grid)
+            self.placeInFront(wood)
             self.wood += 1
 
         elif self.checkInFront() == 'x' or self.checkInFront() == 'F':
@@ -174,8 +174,15 @@ class Factory(GameObject):
             self.releaseSmog()
             self.turnCounter = 0
             self.money += 1
+        if self.turnCounter % 100 == 0:
+            self.createNinja()
+            self.turnCounter = 0
+
     def releaseSmog(self):
         self.grid.environment.co2 += 50
+
+    def createNinja(self):
+        pass
 
 class House(GameObject):
     def __init__(self, grid):
@@ -191,8 +198,8 @@ class Tree(GameObject):
     def doTurn(self):
         self.grid.environment.co2 -= 1
 
-class DeadTree(GameObject):
+class Wood(GameObject):
     def __init__(self, grid):
-        super(DeadTree, self).__init__(grid)
+        super(Wood, self).__init__(grid)
         self.symbol = "x"
-	self.sprite = "dead tree.png"
+	self.sprite = "wood.png"
