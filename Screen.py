@@ -34,6 +34,14 @@ class Screen(object):
         rect = pygame.Rect(position, size)
         return rect
 
+    def multiplyColor(self, r, g, b, multiplier):
+        r = (r * multiplier / 1000) % 255
+        g = (g * multiplier / 1000) % 255
+        b = (b * multiplier / 1000) % 255
+        print (r,g,b)
+        return (r,g,b)
+
+
     def drawRect(self, x, y, w, h, color):
         rect = self.getRect(x, y, w, h)
         pygame.draw.rect(self.pygameScreen, color,(x,y,w,w))
@@ -52,6 +60,7 @@ class Screen(object):
         offsetXPix = offsetX - self.pixelsPerSquare * offsetXSq
         offsetYPix = offsetY - self.pixelsPerSquare * offsetYSq
 
+        print("offsetXPix, offsetYPix")
         print(offsetXPix, offsetYPix)
         x_range= offsetXSq, offsetXSq + self.width_squares
         y_range = offsetYSq, offsetYSq + self.height_squares
@@ -59,5 +68,5 @@ class Screen(object):
             row = grid.grid[y]
             for x in range(x_range[0], x_range[1]): # TODO FIXME double check
                 square = row[x]
-                color = (square.color.r, square.color.g, square.color.b)
+                color = self.multiplyColor(square.color.r, square.color.g, square.color.b, square.elev)
                 self.drawRect((x - offsetXSq) * self.pixelsPerSquare - offsetXPix, (y - offsetYSq) * self.pixelsPerSquare - offsetYPix, self.pixelsPerSquare, self.pixelsPerSquare, color)
