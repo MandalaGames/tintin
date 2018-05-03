@@ -7,6 +7,7 @@ from DataProcessors import CsvReader
 import Environment
 
 GRID_SIZE = 1000
+NUM_LAKES = 200
 NUM_NINJAS = 800
 NUM_TREES = 20000
 NUM_OLDMEN = 100
@@ -32,6 +33,11 @@ grid = Grid.Grid(GRID_SIZE, GRID_SIZE, elevationGrid)
 grid.environment = Environment.Environment()
 
 grid.environment.generateLake(30, 5, 5, grid)
+for i in range(NUM_LAKES):
+    x = random.randint(0, GRID_SIZE-1)
+    y = random.randint(0, GRID_SIZE-1)
+    print("x,y= ",x,y)
+    grid.environment.generateLake(30, x-4, y-4, grid)
 
 print("made game grid")
 
