@@ -8,11 +8,14 @@ import json
 import csv
 
 filename = sys.argv[1]
+outfile = ""
 
 scalefactor = 1
 
 if len(sys.argv) > 2:
     scalefactor = int(sys.argv[2])
+if len(sys.argv) > 3:
+    outfile = str(sys.argv[3])
 
 print(filename)
 elevData = imread(filename)
@@ -21,24 +24,31 @@ elevData = imread(filename)
 x = range(int(len(elevData[0]) / scalefactor))
 y = range(int(len(elevData) / scalefactor))
 
-xstart = 2000 
-xend = 3000
-ystart = 2000  
-yend = 3000
+ystart = 2000 
+yend = 2200
+xstart = 2000  
+xend = 2200
+
+# Data will be broken into files containing 
+# fileChunkSize x fileChunkSize data points
+fileChunkSize = 100 
 
 
 print len(elevData)
 
 elev = []
 if scalefactor != 1:
-    #for line in elevData[xstart:xend:scalefactor]:
-        #elev.append(line[ystart:yend:scalefactor])
-    for line in elevData[::scalefactor]:
-        elev.append(line[::scalefactor])
+    for line in elevData[xstart:xend:scalefactor]:
+        elev.append(line[ystart:yend:scalefactor])
+    #for line in elevData[::scalefactor]:
+        #elev.append(line[::scalefactor])
 else:
     elev = elevData
 
-f = open(filename.split(".tif")[0] + ".csv", 'w')
+if outfile == "":
+    f = open(filename.split(".tif")[0] + ".csv", 'w')
+else:
+    f = open(outfile + ".csv", 'w')
 w = csv.writer(f)
 w.writerows(elev)
 f.close()
@@ -117,17 +127,29 @@ def makeJson(matrix, tris):
     return jsonObj
 
 jsonObj = makeJson(matrix, tris)
-f = open(filename.split('.')[0] + '.json', 'w')
+if outfile == "":
+    f = open(filename.split('.')[0] + '.json', 'w')
+else:
+    f = open(outfile + '.json', 'w')
+
 f.write(json.dumps(jsonObj))
 f.close()
 
 jsonObj2 = makeJson(slopeTileMatrix, tris)
-f = open(filename.split('.')[0] + '_slope_tiles.json', 'w')
+if outfile == "":
+    f = open(filename.split('.')[0] + '_slope_tiles.json', 'w')
+else:
+    f = open(outfile + '_slope_tiles.json', 'w')
+
 f.write(json.dumps(jsonObj2))
 f.close()
 
 jsonObj3 = makeJson(tileMatrix, tris)
-f = open(filename.split('.')[0] + '_tiles.json', 'w')
+if outfile == "":
+    f = open(filename.split('.')[0] + '_tiles.json', 'w')
+else:
+    f = open(outfile + '_tiles.json', 'w')
+
 f.write(json.dumps(jsonObj3))
 f.close()
 

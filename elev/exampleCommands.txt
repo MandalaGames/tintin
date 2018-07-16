@@ -1,0 +1,1 @@
+python processTif.py fuji_small.tif 28 fuji_so_small

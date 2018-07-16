@@ -1,0 +1,27 @@
+Driver: GTiff/GeoTIFF
+Files: fuji_small.tif
+Size is 3600, 3600
+Coordinate System is:
+GEOGCS["WGS 84",
+    DATUM["WGS_1984",
+        SPHEROID["WGS 84",6378137,298.257223563,
+            AUTHORITY["EPSG","7030"]],
+        AUTHORITY["EPSG","6326"]],
+    PRIMEM["Greenwich",0],
+    UNIT["degree",0.0174532925199433],
+    AUTHORITY["EPSG","4326"]]
+Origin = (137.999861111111102,36.000138888888891)
+Pixel Size = (0.000277777777778,-0.000277777777778)
+Metadata:
+  AREA_OR_POINT=Area
+Image Structure Metadata:
+  COMPRESSION=DEFLATE
+  INTERLEAVE=BAND
+Corner Coordinates:
+Upper Left  ( 137.9998611,  36.0001389) (137d59'59.50"E, 36d 0' 0.50"N)
+Lower Left  ( 137.9998611,  35.0001389) (137d59'59.50"E, 35d 0' 0.50"N)
+Upper Right ( 138.9998611,  36.0001389) (138d59'59.50"E, 36d 0' 0.50"N)
+Lower Right ( 138.9998611,  35.0001389) (138d59'59.50"E, 35d 0' 0.50"N)
+Center      ( 138.4998611,  35.5001389) (138d29'59.50"E, 35d30' 0.50"N)
+Band 1 Block=256x256 Type=Int16, ColorInterp=Gray
+  NoData Value=-32768

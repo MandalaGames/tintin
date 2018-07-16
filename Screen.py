@@ -35,6 +35,7 @@ class Screen(object):
         return rect
 
     def multiplyColor(self, r, g, b, multiplier):
+        return (r,g,b)  # FIXME
         r = (r * multiplier / 1000) % 255
         g = (g * multiplier / 1000) % 255
         b = (b * multiplier / 1000) % 255
