@@ -1,69 +1,28 @@
 import numpy as np 
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
-from tifffile import imread
 import sys
 from scipy.spatial import Delaunay
 import json
 import csv
 from coords_to_grid import getGridPosition
+from Parsers import Fuji, FortCollins
 
-filename = sys.argv[1]
-outfile = ""
+args = sys.argv
+filename = args[1]
 
-scalefactor = 1
+elev,x,y= Fuji.parse(args)
 
-if len(sys.argv) > 2:
-    scalefactor = int(sys.argv[2])
-if len(sys.argv) > 3:
-    outfile = str(sys.argv[3])
+def plotData():
+    hf = plt.figure()
+    ha = hf.add_subplot(111, projection='3d')
 
-print(filename)
-elevData = imread(filename)
+    X, Y = np.meshgrid(x, y)  # `plot_surface` expects `x` and `y` elev to be 2D
+    ha.plot_surface(X, Y, elev)
 
-# TODO: use for tools?
-x = range(int(len(elevData[0]) / scalefactor))
-y = range(int(len(elevData) / scalefactor))
+    plt.show()
 
-ystart = 2000 
-yend = 3000
-xstart = 2000  
-xend = 3000
-
-# Data will be broken into files containing 
-# fileChunkSize x fileChunkSize data points
-fileChunkSize = 100 
-
-
-print len(elevData)
-
-elev = []
-if scalefactor != 1:
-    for line in elevData[xstart:xend:scalefactor]:
-        elev.append(line[ystart:yend:scalefactor])
-    #for line in elevData[::scalefactor]:
-        #elev.append(line[::scalefactor])
-else:
-    elev = elevData
-
-if outfile == "":
-    f = open(filename.split(".tif")[0] + ".csv", 'w')
-else:
-    f = open(outfile + ".csv", 'w')
-w = csv.writer(f)
-w.writerows(elev)
-f.close()
-
-# TODO: move to tools
-#hf = plt.figure()
-#ha = hf.add_subplot(111, projection='3d')
-
-#X, Y = np.meshgrid(x, y)  # `plot_surface` expects `x` and `y` elev to be 2D
-#ha.plot_surface(X, Y, elev)
-
-#plt.show()
-
-def makeMatrix(grid):
+def makeMatrix(grid): # ! how grid is structured: just matrix of elev values
     matrix = []
 
     z = grid 
@@ -73,6 +32,10 @@ def makeMatrix(grid):
     return matrix
 
 matrix = makeMatrix(elev)
+
+#print(matrix)
+
+plotData()
 
 matLen = len(elev[0])
 tris = []
@@ -128,36 +91,51 @@ def makeJson(matrix, tris):
     return jsonObj
 
 jsonObj = makeJson(matrix, tris)
-if outfile == "":
-    f = open(filename.split('.')[0] + '.json', 'w')
-else:
-    f = open(outfile + '.json', 'w')
-
+f = open(filename.split('.')[0] + '.json', 'w')
 f.write(json.dumps(jsonObj))
 f.close()
 
 jsonObj2 = makeJson(slopeTileMatrix, tris)
-if outfile == "":
-    f = open(filename.split('.')[0] + '_slope_tiles.json', 'w')
-else:
-    f = open(outfile + '_slope_tiles.json', 'w')
-
+f = open(filename.split('.')[0] + '_slope_tiles.json', 'w')
 f.write(json.dumps(jsonObj2))
 f.close()
 
 jsonObj3 = makeJson(tileMatrix, tris)
-if outfile == "":
-    f = open(filename.split('.')[0] + '_tiles.json', 'w')
-else:
-    f = open(outfile + '_tiles.json', 'w')
-
+f = open(filename.split('.')[0] + '_tiles.json', 'w')
 f.write(json.dumps(jsonObj3))
 f.close()
 
-#print (matrix)
-#print (tris)
+f = open("gridexport.csv", 'w')
+w = csv.writer(f)
+w.writerows(elev)
+f.close()
 
-def makeTris():
+f = open("stuffAroundFuji.json")
+store_locations = json.loads(f.read())
+f.close()
+
+latMin = 35 
+latMax = 36
+lngMin = 138
+lngMax = 139
+
+shopInfo = {"names": [], "xcoords": [], "ycoords": []}
+for item in store_locations["results"]:
+    shopInfo["names"].append(item["name"])
+    loc =  item["geometry"]["location"]
+    gridPos = (getGridPosition(elev, loc["lat"], loc["lng"], latMin, latMax, lngMin, lngMax))
+    shopInfo["xcoords"].append(gridPos[0])
+    shopInfo["ycoords"].append(gridPos[1])
+
+f = open("shop_info.json", 'w')
+f.write(json.dumps(shopInfo))
+f.close()
+
+print("mt fuji")
+print(getGridPosition(elev,35.3618,138.7298, latMin, latMax, lngMin, lngMax))
+
+
+def delaunayTris(): # not relevant
     tris = Delaunay(matrix)
 
     pfile = open('points.cs','w')
