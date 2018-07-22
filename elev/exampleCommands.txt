@@ -1,1 +1,7 @@
 python processTif.py fuji_small.tif 28 fuji_so_small
+
+
+**
+
+python processTif.py info fuji_small.tif
+

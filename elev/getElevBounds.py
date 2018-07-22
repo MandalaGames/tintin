@@ -40,12 +40,14 @@ def getGdalInfo(tifFilename):
         longitude = p1.findall(content)[0]
         latitude = p2.findall(content)[0]
 
-        print  "latitude ",latitude,"longitude ", longitude, ul, lr
-
         if(ul):
-            minLatitude = float(latitude)
-            maxLongitude = float(latitude)
-        elif(lr):
             maxLatitude = float(latitude)
             minLongitude = float(longitude)
-    print minLatitude, maxLatitude, minLongitude, maxLongitude
+        elif(lr):
+            minLatitude = float(latitude)
+            maxLongitude = float(longitude)
+
+    #print "minLatitude, maxLatitude, minLongitude, maxLongitude"
+    #print minLatitude, maxLatitude, minLongitude, maxLongitude
+
+    return minLatitude, maxLatitude, minLongitude, maxLongitude
